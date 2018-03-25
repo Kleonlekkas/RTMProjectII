@@ -53,11 +53,11 @@ const checkAttacks = () => {
           /**
             Since this is a separate process we can only communicate
             via messages. Having this process send a message back
-            to the other process means the other process has a 
-            process.on listener for messages. 
-          **/
-          //send an 'attackHit' message back to the main process
-          //along with the character that is being hit
+            to the other process means the other process has a
+            process.on listener for messages.
+          * */
+          // send an 'attackHit' message back to the main process
+          // along with the character that is being hit
           process.send(new Message('attackHit', char1.hash));
           // kill that character and remove from our user list
           delete charList[char1.hash];
@@ -81,38 +81,38 @@ setInterval(() => {
   checkAttacks();
 }, 20);
 
-//listen for messages from the main process
-/** 
+// listen for messages from the main process
+/**
  Since this is a child process and it has separate memory, it
  cannot directly access variables or call functions in the main process
- and vice versa. 
- 
+ and vice versa.
+
  The server will send() messages to this process. We are using a custom
  message type for consistency in messages.
-**/
+* */
 process.on('message', (messageObject) => {
-  //check our custom message object for the type
+  // check our custom message object for the type
   switch (messageObject.type) {
-    //if message type is charList
+    // if message type is charList
     case 'charList': {
-      //update our character list with the data provided
+      // update our character list with the data provided
       charList = messageObject.data;
       break;
     }
-    //if message type is char
+    // if message type is char
     case 'char': {
-      //update a specific character with the character provided
+      // update a specific character with the character provided
       const character = messageObject.data;
       charList[character.hash] = character;
       break;
     }
-    //if message type is attack
+    // if message type is attack
     case 'attack': {
-      //add our attack object from the message
+      // add our attack object from the message
       attacks.push(messageObject.data);
       break;
     }
-    //otherwise default
+    // otherwise default
     default: {
       console.log('Type not recognized');
     }

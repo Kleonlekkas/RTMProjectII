@@ -6,7 +6,7 @@ const path = require('path');
   but it's a good framework to know. We are using it to
   send the index page and automatically host the entire
   'hosted' folder and contents.
-**/
+* */
 const express = require('express');
 const socketio = require('socket.io');
 const sockets = require('./sockets.js');
@@ -29,7 +29,7 @@ const app = express();
   So the URL /assets/style.css would pull the file /hosted/style.css
 
   The URL /assets/img/favicon.png would pull the file /hosted/img/favicon.png
-**/
+* */
 app.use('/assets', express.static(path.resolve(`${__dirname}/../hosted/`)));
 
 /**
@@ -37,7 +37,7 @@ app.use('/assets', express.static(path.resolve(`${__dirname}/../hosted/`)));
   In this case, on GET requests to the / (or homepage) URL.
   We get the request and response objects from the normal
   Node HTTP server.
-**/
+* */
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(`${__dirname}/../hosted/index.html`));
 });

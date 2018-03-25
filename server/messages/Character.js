@@ -8,8 +8,8 @@ class Character {
     this.prevY = 0;
     this.destX = 0;
     this.destY = 0;
-    this.height = 100;
-    this.width = 100;
+    this.height = 60;
+    this.width = 60;
     this.alpha = 0;
     this.direction = 0;
     this.frame = 0;
@@ -18,6 +18,7 @@ class Character {
     this.moveRight = false;
     this.moveDown = false;
     this.moveUp = false;
+	this.power = 1;
   }
 }
 

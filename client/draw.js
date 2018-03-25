@@ -14,8 +14,8 @@ const directions = {
 
 //size of our character sprites
 const spriteSizes = {
-  WIDTH: 61,
-  HEIGHT: 121
+  WIDTH: 60,
+  HEIGHT: 60
 };
 
 //function to lerp (linear interpolation)
@@ -25,12 +25,69 @@ const lerp = (v0, v1, alpha) => {
   return (1 - alpha) * v0 + alpha * v1;
 };
 
+
 //redraw with requestAnimationFrame
 const redraw = (time) => {
   //update this user's positions
   updatePosition();
 
-  ctx.clearRect(0, 0, 500, 500);
+  ctx.clearRect(0, 0, 715, 715);
+  
+  ctx.fillStyle = "#000000";
+  //Draw walls
+	const wallKeys = Object.keys(walls);
+	
+  for(let n = 0; n < wallKeys.length; n++) {
+	ctx.fillRect(walls[n].xPos, walls[n].yPos, 65, 65);
+  }
+  
+	//check to see if theyre colliding
+   for(let n = 0; n < wallKeys.length; n++) {
+	   
+	   
+	if (checkWallCollisions(squares[hash], walls[n], cSIZE, cSIZE)) {
+		console.log("colliding!");
+		const square = squares[hash];
+		playerCanMove = false;
+		//find their closest point
+		var cp = findClosestPoint(square);
+		square.x = sectionArray[cp].x;
+		square.y = sectionArray[cp].y;		
+	}
+	playerCanMove = true;
+  }
+  
+	//draw before player so they can be on top
+    //for each attack, draw each to the screen
+  for(let i = 0; i < attacks.length; i++) {
+    const attack = attacks[i];
+    
+    //draw the attack image
+    ctx.drawImage(
+      bombImage,
+      attack.x,
+      attack.y,
+      attack.width,
+      attack.height
+    );
+    
+    //count how many times we have drawn this particular attack
+    attack.frames++;
+    
+    //if the attack has been drawn for 120 frames (two seconds)
+    //then stop drawing it and remove it from the attacks to draw
+	//detonate it
+    if(attack.frames > 120) {
+		detonateBomb(attack);
+    }
+	//let explosion sit on screen for half a second
+	if (attack.frames > 150) {
+		//remove from our attacks array
+		attacks.splice(i);
+		//decrease i since splice changes the array length
+		i--;
+	}
+  }
 
   //each user id
   const keys = Object.keys(squares);
@@ -89,31 +146,7 @@ const redraw = (time) => {
     ctx.strokeRect(square.x, square.y, spriteSizes.WIDTH, spriteSizes.HEIGHT);
   }
   
-  //for each attack, draw each to the screen
-  for(let i = 0; i < attacks.length; i++) {
-    const attack = attacks[i];
-    
-    //draw the attack image
-    ctx.drawImage(
-      slashImage,
-      attack.x,
-      attack.y,
-      attack.width,
-      attack.height
-    );
-    
-    //count how many times we have drawn this particular attack
-    attack.frames++;
-    
-    //if the attack has been drawn for 30 frames (half a second)
-    //then stop drawing it and remove it from the attacks to draw
-    if(attack.frames > 30) {
-      //remove from our attacks array
-      attacks.splice(i);
-      //decrease i since splice changes the array length
-      i--;
-    }
-  }
+
 
   //set our next animation frame
   animationFrame = requestAnimationFrame(redraw);

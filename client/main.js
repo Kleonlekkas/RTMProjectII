@@ -1,11 +1,35 @@
 let canvas;
 let ctx;
 let walkImage;
-let slashImage;
+let bombImage;
 //our websocket connection
 let socket; 
 let hash;
 let animationFrame;
+
+//terrain
+let walls = {};
+//size of our character
+let cSIZE;
+//if the player is colliding with a block, they lose ability to move until they're not
+let playerCanMove = true;
+
+//General map terrain for now, read it as an array. Later have possibility to vote
+//on different maps and read in the array to load it
+let map = [];
+
+//Arrays of points to auto move bomb placements so they're nice in grid like
+//split into three as to help with optimization, i think
+//they are separated by their y values
+let topThird = [];
+let midThird = [];
+let botThird = [];
+
+//store the current section
+let sectionArray;
+
+//keep track of the section the player is in
+let section;
 
 let squares = {};
 let attacks = [];
@@ -59,10 +83,30 @@ const keyUpHandler = (e) => {
 
 const init = () => {
   walkImage = document.querySelector('#walk');
-  slashImage = document.querySelector('#slash');
+  bombImage = document.querySelector('#bomb');
   
   canvas = document.querySelector('#canvas');
   ctx = canvas.getContext('2d');
+  
+  //get map
+  //1's represent walls
+  cSIZE = 60;
+  map = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		 [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+		 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		 [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+		 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		 [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+		 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		 [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+		 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		 [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+		 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
+		
+	//when wed recieve the map, wed populate it
+	populateWallArray(map);
+	populatePointArray();
+	
 
   socket = io.connect();
 

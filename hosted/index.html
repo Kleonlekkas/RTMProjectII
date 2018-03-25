@@ -30,10 +30,9 @@
 	<script src="/assets/compiled.js"> </script>
 </head>
 <body>
-    <canvas id="canvas" height="500" width="500">Please use an HTML 5 browser</canvas>
-    <p>This will lag severely when the window is not in focus due to the event loop being drastically slowed.</p>
-    <p>It may also jitter because of inconsistent timing of packets arriving. Some of that has been mitigated by checking the times on packets, but it won't account for any lag, so there might be jitter or jumps. This is avoided with a much more advanced technique called "play out delay", but depending on the implementation, that might be under very heavy patents.</p>
+	<!--map needs 11 rows, so we'll make it 715, 65 for each row -->
+    <canvas id="canvas" height="715" width="715">Please use an HTML 5 browser</canvas>
     <img id="walk" class="hidden" src="/assets/walk.png" alt="walk spritesheet" />
-    <img id="slash" class="hidden" src="/assets/slash.png" alt="slash spritesheet" />
+    <img id="bomb" class="hidden" src="/assets/bomb.png" alt="bomb image" />
 </body>
 </html>
