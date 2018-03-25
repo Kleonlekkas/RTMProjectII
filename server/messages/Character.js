@@ -19,6 +19,7 @@ class Character {
     this.moveDown = false;
     this.moveUp = false;
 	this.power = 1;
+	this.limit = 1;
   }
 }
 

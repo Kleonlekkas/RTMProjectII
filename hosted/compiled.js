@@ -45,7 +45,7 @@ var redraw = function redraw(time) {
   //check to see if theyre colliding
   for (var _n = 0; _n < wallKeys.length; _n++) {
 
-    if (checkWallCollisions(squares[hash], walls[_n], cSIZE, cSIZE)) {
+    if (checkWallCollisions(squares[hash], walls[_n], cSIZE, 65)) {
       console.log("colliding!");
       var square = squares[hash];
       playerCanMove = false;
@@ -467,8 +467,15 @@ var populatePointArray = function populatePointArray() {
 };
 
 //Collision with walls, rect1 is player, rect2 is terrain
-var checkWallCollisions = function checkWallCollisions(rect1, rect2, width, height) {
-  if (rect1.destX < rect2.xPos + width && rect1.destX + width > rect2.xPos && rect1.destY < rect2.yPos + height && height + rect1.destX > rect2.yPos) {
+//sizes width/height are same since theyre squares
+var checkWallCollisions = function checkWallCollisions(rect1, rect2, size1, size2) {
+
+  if (rect1.x < rect2.xPos + size2 && rect1.x + size1 > rect2.xPos && rect1.y < rect2.yPos + size2 && size1 + rect1.x > rect2.yPos) {
+    ctx.fillStyle = "#00FF00";
+    ctx.beginPath();
+    ctx.moveTo(rect1.x, rect1.y);
+    ctx.lineTo(rect2.xPos, rect2.yPos);
+    ctx.stroke();
     return true; // is colliding
   }
   return false; // is not colliding

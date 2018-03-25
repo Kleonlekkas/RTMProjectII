@@ -45,7 +45,7 @@ const redraw = (time) => {
    for(let n = 0; n < wallKeys.length; n++) {
 	   
 	   
-	if (checkWallCollisions(squares[hash], walls[n], cSIZE, cSIZE)) {
+	if (checkWallCollisions(squares[hash], walls[n], cSIZE, 65)) {
 		console.log("colliding!");
 		const square = squares[hash];
 		playerCanMove = false;
