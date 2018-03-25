@@ -18,6 +18,7 @@ let io;
 // Possible directions a user can move
 // their character. These are mapped
 // to integers for fast/small storage
+/*
 const directions = {
   DOWNLEFT: 0,
   DOWN: 1,
@@ -27,7 +28,7 @@ const directions = {
   RIGHT: 5,
   UPRIGHT: 6,
   UP: 7,
-};
+}; */
 
 // start a child process for our custom physics file
 // This will kick off a process of that file and execute it
@@ -137,12 +138,10 @@ const setupSockets = (ioServer) => {
       const attack = data;
 
       // should we handle the attack
-      // I only did this because I did not code
-      // for all player directions.
-      let handleAttack = true;
- 
-	  attack.width = 60;
-	  attack.height = 60;
+      const handleAttack = true;
+
+      attack.width = 60;
+      attack.height = 60;
 
       // if handling the attack
       if (handleAttack) {
