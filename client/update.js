@@ -61,17 +61,23 @@ const sendAttack = () => {
   
 	//create a new attack at the closest appropriate point
 	var cp = findClosestPoint(square);
-  
-  const attack = {
-    hash: hash,
-    x: sectionArray[cp].x,
-    y: sectionArray[cp].y,
-	power: square.power,
-    frames: 0,
-  }
+	//check if that point is fine
+	if (pointAvailable(cp))
+	{
+		
+		const attack = {
+			hash: hash,
+			x: sectionArray[cp].x,
+			y: sectionArray[cp].y,
+			power: square.power,
+			frames: 0,
+		}
 
-  //send request to server
-  socket.emit('attack', attack);
+		//send request to server
+		socket.emit('attack', attack);	
+	}	
+  
+
 };
 
 //when a character is killed
@@ -176,7 +182,7 @@ const populateWallArray = (data) => {
 //function to populate top, mid, and bot point arrays with the center points of each grid
 const populatePointArray = () => {
 	//current canvas size is 715, 65 * 11
-	//our points mightt not need to be centered but if they do, 32.5 offset
+	//add points, and an occupied property
 	var xPos;
 	var yPos;
 	for (var i = 0; i < 11; i++) { //y
@@ -196,6 +202,7 @@ const populatePointArray = () => {
 				topThird[Object.keys(topThird).length] = {
 					x: xPos,
 					y: yPos,
+					occ: false,
 				}
 			}
 			//second third
@@ -203,13 +210,16 @@ const populatePointArray = () => {
 				midThird[Object.keys(midThird).length] = {
 					x: xPos,
 					y: yPos,
+					occ: false,
 				}
 			}
 			//third third
 			else {
 				botThird[Object.keys(botThird).length] = {
+				botThird[Object.keys(botThird).length] = {
 					x: xPos,
 					y: yPos,
+					occ: false,
 				}
 			}
 		}
@@ -220,16 +230,34 @@ const populatePointArray = () => {
 //Collision with walls, rect1 is player, rect2 is terrain
 //sizes width/height are same since theyre squares
 const checkWallCollisions = (rect1, rect2, size1, size2) => {
-
+	
+	//left side of first rect is less than the second rects right side
+	//right side of first rect is greater than second rects left side
   if (rect1.x < rect2.xPos + size2 &&
      rect1.x + size1 > rect2.xPos &&
      rect1.y < rect2.yPos + size2 &&
-     size1 + rect1.x > rect2.yPos) {
-		 ctx.fillStyle = "#00FF00";
-		ctx.beginPath();
+     size1 + rect1.yz > rect2.yPos) {
+		 ctx.fillStyle = "#FF0000";
+		ctx.beginPath(); // top left corner
 		ctx.moveTo(rect1.x, rect1.y);
 		ctx.lineTo(rect2.xPos, rect2.yPos);
 		ctx.stroke();
+		
+		ctx.beginPath(); //top right corner
+		ctx.moveTo(rect1.x + size1, rect1.y);
+		ctx.lineTo(rect2.xPos + size2, rect2.yPos);
+		ctx.stroke();
+		
+		ctx.beginPath();
+		ctx.moveTo(rect1.x, rect1.y + size1); //bottom left corner
+		ctx.lineTo(rect2.xPos, rect2.yPos + size1);
+		ctx.stroke();
+		
+		ctx.beginPath();
+		ctx.moveTo(rect1.x + size1, rect1.y + size1); //bottom right corner
+		ctx.lineTo(rect2.xPos + size2, rect2.yPos + size2);
+		ctx.stroke();
+		
     return true; // is colliding
   }
   return false; // is not colliding
@@ -256,6 +284,9 @@ const detonateBomb = (attack) => {
 	//y direction
 	ctx.fillRect(attack.x, attack.y - offSet/3, 60, offSet);
 	
+	//make that point no longer occupied
+	
+	
 };
 
 //Helper distance function
@@ -263,7 +294,7 @@ const detonateBomb = (attack) => {
 //https://stackoverflow.com/users/928540/ekstrakt
 const dist = (x1, y1, x2, y2) => {
 	return (Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2)));
-}
+};
 
 //return the index in the array
 const findClosestPoint = (square) => {
@@ -277,4 +308,18 @@ const findClosestPoint = (square) => {
 	  }
   }
   return closestPoint;
-}
+};
+
+//Check if the point the player is trying to place a bomb in is available
+const pointAvailable = (ind) => {
+	console.log(sectionArray[ind]);
+	//if its unoccupied
+	if (sectionArray[ind].occ == false) {
+		//make it occupied
+		sectionArray[ind].occ = true;
+		return true;
+	} else {
+		return false;
+	}
+};
+

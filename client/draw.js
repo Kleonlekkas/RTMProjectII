@@ -41,6 +41,11 @@ const redraw = (time) => {
 	ctx.fillRect(walls[n].xPos, walls[n].yPos, 65, 65);
   }
   
+    ctx.fillStyle = "#0000FF";
+    for(let n = 0; n < wallKeys.length; n++) {
+	ctx.fillRect(walls[n].xPos, walls[n].yPos, 10, 10);
+  }
+  
 	//check to see if theyre colliding
    for(let n = 0; n < wallKeys.length; n++) {
 	   
