@@ -16,8 +16,8 @@ var directions = {
 
 //size of our character sprites
 var spriteSizes = {
-  WIDTH: 60,
-  HEIGHT: 60
+  WIDTH: 50,
+  HEIGHT: 50
 };
 
 //function to lerp (linear interpolation)
@@ -49,15 +49,15 @@ var redraw = function redraw(time) {
 
   //check to see if theyre colliding
   for (var _n2 = 0; _n2 < wallKeys.length; _n2++) {
-
-    if (checkWallCollisions(squares[hash], walls[_n2], cSIZE, 65)) {
+    //character, wall, character size, wall size
+    if (checkWallCollisions(squares[hash], walls[_n2], 50, 65)) {
       console.log("colliding!");
       var square = squares[hash];
       playerCanMove = false;
       //find their closest point
       var cp = findClosestPoint(square);
-      square.x = sectionArray[cp].x;
-      square.y = sectionArray[cp].y;
+      square.destX = sectionArray[cp].x;
+      square.destY = sectionArray[cp].y;
     }
     playerCanMove = true;
   }
@@ -480,10 +480,9 @@ var populatePointArray = function populatePointArray() {
 //Collision with walls, rect1 is player, rect2 is terrain
 //sizes width/height are same since theyre squares
 var checkWallCollisions = function checkWallCollisions(rect1, rect2, size1, size2) {
-
 		//left side of first rect is less than the second rects right side
-		//right side of first rect is greater than second rects left side
-		if (rect1.x < rect2.xPos + size2 && rect1.x + size1 > rect2.xPos && rect1.y < rect2.yPos + size2 && size1 + rect1.yz > rect2.yPos) {
+		//right side of first rect is greater than second rects left side		
+		if (rect1.x < rect2.xPos + size2 && rect1.x + size1 > rect2.xPos && rect1.y < rect2.yPos + size2 && size1 + rect1.y > rect2.yPos) {
 				ctx.fillStyle = "#FF0000";
 				ctx.beginPath(); // top left corner
 				ctx.moveTo(rect1.x, rect1.y);
@@ -530,6 +529,9 @@ var detonateBomb = function detonateBomb(attack) {
 		ctx.fillRect(attack.x - offSet / 3, attack.y, offSet, 60);
 		//y direction
 		ctx.fillRect(attack.x, attack.y - offSet / 3, 60, offSet);
+
+		//make that point no longer occupied
+
 };
 
 //Helper distance function
@@ -564,4 +566,12 @@ var pointAvailable = function pointAvailable(ind) {
 		} else {
 				return false;
 		}
+};
+
+//Helper to our collider. If it does collide, figure out which side of the square its on.
+var findSide = function findSide(square, wall) {
+		var topVal;
+		var botVal;
+		var leftVal;
+		var rightVal;
 };

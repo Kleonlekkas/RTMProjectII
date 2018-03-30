@@ -14,8 +14,8 @@ const directions = {
 
 //size of our character sprites
 const spriteSizes = {
-  WIDTH: 60,
-  HEIGHT: 60
+  WIDTH: 50,
+  HEIGHT: 50
 };
 
 //function to lerp (linear interpolation)
@@ -48,16 +48,15 @@ const redraw = (time) => {
   
 	//check to see if theyre colliding
    for(let n = 0; n < wallKeys.length; n++) {
-	   
-	   
-	if (checkWallCollisions(squares[hash], walls[n], cSIZE, 65)) {
+	//character, wall, character size, wall size
+	if (checkWallCollisions(squares[hash], walls[n], 50, 65)) {
 		console.log("colliding!");
 		const square = squares[hash];
 		playerCanMove = false;
 		//find their closest point
 		var cp = findClosestPoint(square);
-		square.x = sectionArray[cp].x;
-		square.y = sectionArray[cp].y;		
+		square.destX = sectionArray[cp].x;
+		square.destY = sectionArray[cp].y;		
 	}
 	playerCanMove = true;
   }

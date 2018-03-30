@@ -216,7 +216,6 @@ const populatePointArray = () => {
 			//third third
 			else {
 				botThird[Object.keys(botThird).length] = {
-				botThird[Object.keys(botThird).length] = {
 					x: xPos,
 					y: yPos,
 					occ: false,
@@ -230,13 +229,12 @@ const populatePointArray = () => {
 //Collision with walls, rect1 is player, rect2 is terrain
 //sizes width/height are same since theyre squares
 const checkWallCollisions = (rect1, rect2, size1, size2) => {
-	
 	//left side of first rect is less than the second rects right side
-	//right side of first rect is greater than second rects left side
+	//right side of first rect is greater than second rects left side		
   if (rect1.x < rect2.xPos + size2 &&
      rect1.x + size1 > rect2.xPos &&
      rect1.y < rect2.yPos + size2 &&
-     size1 + rect1.yz > rect2.yPos) {
+     size1 + rect1.y > rect2.yPos) {
 		 ctx.fillStyle = "#FF0000";
 		ctx.beginPath(); // top left corner
 		ctx.moveTo(rect1.x, rect1.y);
@@ -321,5 +319,14 @@ const pointAvailable = (ind) => {
 	} else {
 		return false;
 	}
+};
+
+//Helper to our collider. If it does collide, figure out which side of the square its on.
+const findSide = (square, wall) => {
+	var topVal;
+	var botVal;
+	var leftVal;
+	var rightVal;
+	
 };
 
