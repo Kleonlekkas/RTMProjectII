@@ -12,12 +12,12 @@ class Character {
     this.width = 60;
     this.alpha = 0;
     this.direction = 0;
-    this.frame = 0;
-    this.frameCount = 0;
+    this.room = 'room1';
     this.moveLeft = false;
     this.moveRight = false;
     this.moveDown = false;
     this.moveUp = false;
+    this.color = 'orange';
     this.power = 1;
     this.limit = 1;
   }

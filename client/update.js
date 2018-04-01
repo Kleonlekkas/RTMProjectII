@@ -62,15 +62,17 @@ const sendAttack = () => {
 	//create a new attack at the closest appropriate point
 	var cp = findClosestPoint(square);
 	//check if that point is fine
+	//hold a unique hash, coordinates, power, the index of the point in section array, and a hasDetonated bool
 	if (pointAvailable(cp))
-	{
-		
+	{	
 		const attack = {
 			hash: hash,
 			x: sectionArray[cp].x,
 			y: sectionArray[cp].y,
 			power: square.power,
 			frames: 0,
+			index: cp,
+			det: false,
 		}
 
 		//send request to server
@@ -90,10 +92,11 @@ const playerDeath = (data) => {
   if(data === hash) {
     socket.disconnect();
     cancelAnimationFrame(animationFrame);
-    ctx.fillRect(0, 0, 500, 500);
+	ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, 715, 715);
     ctx.fillStyle = 'white';
     ctx.font = '48px serif';
-    ctx.fillText('You died', 50, 100);
+    ctx.fillText('Aw man you heckin goofus. You lost.', 0, 350);
   }
 };
 
@@ -124,6 +127,7 @@ const updatePosition = () => {
   
   //keep track of the section the player is in
   //section is redundant atm but nice for debugging
+  /*
   if (square.y > 475) {
 	  section = 3;
 	  sectionArray = botThird;
@@ -134,6 +138,7 @@ const updatePosition = () => {
 	  section = 1;
 	  sectionArray = topThird;
   }
+  */
   //console.log(section);
 
   //determine direction based on the inputs of direction keys
@@ -197,6 +202,7 @@ const populatePointArray = () => {
 					continue;
 				}
 			}
+			/*
 			//first third
 			if (i < 4) {
 				topThird[Object.keys(topThird).length] = {
@@ -220,6 +226,12 @@ const populatePointArray = () => {
 					y: yPos,
 					occ: false,
 				}
+			}
+			*/
+			sectionArray[Object.keys(sectionArray).length] = {
+				x: xPos,
+				y: yPos,
+				occ: false,
 			}
 		}
 	}
@@ -262,6 +274,22 @@ const checkWallCollisions = (rect1, rect2, size1, size2) => {
 };
 
 const detonateBomb = (attack) => {
+	//Set its detonated property to true
+	//Free up the point so bombs can be placed again
+	sectionArray[attack.index].occ = false;
+	
+	//we need to find the attack in the attacks array in order to set its value,
+	//since weve already pushed it in
+	for (var i = 0; i < attacks.length; i++) {
+		if (attacks[i].index == attack.index) {
+			//if this is our attack, set its detonated property to true
+			attacks[i].det = true;
+		}
+	}
+	
+};
+
+const drawBomb = (attack) => {
 	ctx.fillStyle = "#FF0000";
 	//draw squares to represent explosion
 	/*
@@ -275,16 +303,13 @@ const detonateBomb = (attack) => {
 	} */
 	//will probably have to get top portion working, so i can actually stop
 	//drawing explosions if i hit a wall
+	console.log("bomb has been boomed");
 	const offSet = (attack.power + 2) * 65;
 	
 	//x direction
 	ctx.fillRect(attack.x - offSet/3, attack.y, offSet, 60);
 	//y direction
 	ctx.fillRect(attack.x, attack.y - offSet/3, 60, offSet);
-	
-	//make that point no longer occupied
-	
-	
 };
 
 //Helper distance function
@@ -323,10 +348,33 @@ const pointAvailable = (ind) => {
 
 //Helper to our collider. If it does collide, figure out which side of the square its on.
 const findSide = (square, wall) => {
-	var topVal;
-	var botVal;
-	var leftVal;
-	var rightVal;
+	
+	//If our squares y is in between our walls y and size, then it has to be on its left or right
+	//we know size of wall is 65
+	if (square.y > wall.yPos - 60 && square.y < wall.yPos + 65) {
+		//Check if its on left or right side
+		if (square.x > wall.xPos) {
+			//right side
+			return "right";
+		}
+		else {
+			return "left";
+		}
+	} else {
+		//we know its above or below it
+		if ( square.y < wall.yPos) {
+			//above it
+			return "top";
+		} else {
+			return "bottom";
+		}
+	}
 	
 };
 
+//check to see if were good to start the game
+const gameStart = (userCount) => {
+	if (userCount > 1) {
+		playGame = true;
+	}
+};

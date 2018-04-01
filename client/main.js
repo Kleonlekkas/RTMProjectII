@@ -21,12 +21,15 @@ let map = [];
 //Arrays of points to auto move bomb placements so they're nice in grid like
 //split into three as to help with optimization, i think
 //they are separated by their y values
-let topThird = [];
-let midThird = [];
-let botThird = [];
+//let topThird = [];
+//let midThird = [];
+//let botThird = [];
+
+//boolean to check if theres enough users.
+let playGame = false;
 
 //store the current section
-let sectionArray;
+let sectionArray = [];
 
 //keep track of the section the player is in
 let section;
@@ -37,48 +40,53 @@ let attacks = [];
 const keyDownHandler = (e) => {
   var keyPressed = e.which;
   const square = squares[hash];
+  if (playGame) {
+	// W OR UP
+	if(keyPressed === 87 || keyPressed === 38) {
+		square.moveUp = true;
+	}
+	// A OR LEFT
+	else if(keyPressed === 65 || keyPressed === 37) {
+		square.moveLeft = true;
+	}
+	// S OR DOWN
+	else if(keyPressed === 83 || keyPressed === 40) {
+		square.moveDown = true;
+	}
+	// D OR RIGHT
+	else if(keyPressed === 68 || keyPressed === 39) {
+		square.moveRight = true;
+	}
+  }
 
-  // W OR UP
-  if(keyPressed === 87 || keyPressed === 38) {
-    square.moveUp = true;
-  }
-  // A OR LEFT
-  else if(keyPressed === 65 || keyPressed === 37) {
-    square.moveLeft = true;
-  }
-  // S OR DOWN
-  else if(keyPressed === 83 || keyPressed === 40) {
-    square.moveDown = true;
-  }
-  // D OR RIGHT
-  else if(keyPressed === 68 || keyPressed === 39) {
-    square.moveRight = true;
-  }
 };
 
 const keyUpHandler = (e) => {
   var keyPressed = e.which;
   const square = squares[hash];
 
-  // W OR UP
-  if(keyPressed === 87 || keyPressed === 38) {
-    square.moveUp = false;
+  if (playGame) {
+	// W OR UP
+	if(keyPressed === 87 || keyPressed === 38) {
+		square.moveUp = false;
+	}
+	// A OR LEFT
+	else if(keyPressed === 65 || keyPressed === 37) {
+		square.moveLeft = false;
+	}
+	// S OR DOWN
+	else if(keyPressed === 83 || keyPressed === 40) {
+		square.moveDown = false;
+	}
+	// D OR RIGHT
+	else if(keyPressed === 68 || keyPressed === 39) {
+		square.moveRight = false;
+	}
+	else if(keyPressed === 32) {
+		sendAttack();
+	}
   }
-  // A OR LEFT
-  else if(keyPressed === 65 || keyPressed === 37) {
-    square.moveLeft = false;
-  }
-  // S OR DOWN
-  else if(keyPressed === 83 || keyPressed === 40) {
-    square.moveDown = false;
-  }
-  // D OR RIGHT
-  else if(keyPressed === 68 || keyPressed === 39) {
-    square.moveRight = false;
-  }
-  else if(keyPressed === 32) {
-    sendAttack();
-  }
+
 };
 
 const init = () => {
@@ -114,7 +122,9 @@ const init = () => {
   socket.on('updatedMovement', update); //when players move
   socket.on('attackHit', playerDeath); //when a player dies
   socket.on('attackUpdate', receiveAttack); //when an attack is sent
+  socket.on('detonate', detonateBomb);
   socket.on('left', removeUser); //when a user leaves
+  socket.on('userUpdate', gameStart);
 
   document.body.addEventListener('keydown', keyDownHandler);
   document.body.addEventListener('keyup', keyUpHandler);

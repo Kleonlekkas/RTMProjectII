@@ -33,6 +33,12 @@ const redraw = (time) => {
 
   ctx.clearRect(0, 0, 715, 715);
   
+  //If were not ready to play the game, let the user know
+  if (!playGame) {
+	ctx.font = "32px Arial";
+	ctx.fillText("Waiting for another player...", 200, 700);
+  }
+  
   ctx.fillStyle = "#000000";
   //Draw walls
 	const wallKeys = Object.keys(walls);
@@ -55,6 +61,9 @@ const redraw = (time) => {
 		playerCanMove = false;
 		//find their closest point
 		var cp = findClosestPoint(square);
+		//find out where theyre colliding
+		console.log(findSide(square, walls[n]));
+		
 		square.destX = sectionArray[cp].x;
 		square.destY = sectionArray[cp].y;		
 	}
@@ -76,21 +85,36 @@ const redraw = (time) => {
     );
     
     //count how many times we have drawn this particular attack
-    attack.frames++;
+    //attack.frames++;
     
     //if the attack has been drawn for 120 frames (two seconds)
     //then stop drawing it and remove it from the attacks to draw
 	//detonate it
-    if(attack.frames > 120) {
-		detonateBomb(attack);
-    }
+	
+    //if(attack.frames > 120) {
+		//detonateBomb(attack);
+   // }
 	//let explosion sit on screen for half a second
+	//console.log(attack);
+	
+	if (attack.det == true) {
+		attack.frames++;
+		//Draw the actual explosion
+		drawBomb(attack);
+		if (attack.frames > 30) {
+			attacks.splice(i);
+			//decrease i since splice changes array length
+			i--;
+		}
+	}
+	
+	/*
 	if (attack.frames > 150) {
 		//remove from our attacks array
 		attacks.splice(i);
 		//decrease i since splice changes the array length
 		i--;
-	}
+	} */
   }
 
   //each user id
@@ -104,47 +128,13 @@ const redraw = (time) => {
     //if alpha less than 1, increase it by 0.01
     if(square.alpha < 1) square.alpha += 0.05;
 
-    //applying a filter effect to other characters
-    //in order to see our character easily
-    if(square.hash === hash) {
-      ctx.filter = "none"
-    }
-    else {
-      ctx.filter = "hue-rotate(40deg)";
-    }
-
     //calculate lerp of the x/y from the destinations
     square.x = lerp(square.prevX, square.destX, square.alpha);
     square.y = lerp(square.prevY, square.destY, square.alpha);
 
-    // if we are mid animation or moving in any direction
-    if(square.frame > 0 || (square.moveUp || square.moveDown || square.moveRight || square.moveLeft)) {
-      //increase our framecount
-      square.frameCount++;
-
-      //every 8 frames increase which sprite image we draw to animate
-      //or reset to the beginning of the animation
-      if(square.frameCount % 8 === 0) {
-        if(square.frame < 7) {
-          square.frame++;
-        } else {
-          square.frame = 0;
-        }
-      }
-    }
-
-    //draw our characters
-    ctx.drawImage(
-      walkImage, 
-      spriteSizes.WIDTH * square.frame,
-      spriteSizes.HEIGHT * square.direction,
-      spriteSizes.WIDTH, 
-      spriteSizes.HEIGHT,
-      square.x, 
-      square.y, 
-      spriteSizes.WIDTH, 
-      spriteSizes.HEIGHT
-    );
+	
+	ctx.fillStyle = square.color;
+	ctx.fillRect(square.x, square.y, spriteSizes.WIDTH, spriteSizes.HEIGHT);
     
     //highlight collision box for each character
     ctx.strokeRect(square.x, square.y, spriteSizes.WIDTH, spriteSizes.HEIGHT);

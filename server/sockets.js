@@ -30,6 +30,13 @@ const directions = {
   UP: 7,
 }; */
 
+// Room keep track of the room number to incriment as users join
+// keep track of users as well
+let roomNum = 0;
+let users = 0;
+let svrRoom;
+let userRoom;
+
 // start a child process for our custom physics file
 // This will kick off a process of that file and execute it
 // as a separate node process. When it completes it will call
@@ -55,7 +62,7 @@ physics.on('message', (m) => {
     case 'attackHit': {
       // send out the attackHit event to all users along
       // with the data we received from the physics message
-      io.sockets.in('room1').emit('attackHit', m.data);
+      io.sockets.in(userRoom).emit('attackHit', m.data);
       break;
     }
     // otherwise we will assume we do not recongize the message type
@@ -103,20 +110,65 @@ const setupSockets = (ioServer) => {
   io.on('connection', (sock) => {
     const socket = sock;
 
+    // incriment our Room number
+    users++;
+
+    svrRoom = `room${roomNum}`;
+
     // join user to our socket room
-    socket.join('room1');
+    socket.join(svrRoom);
 
     // create a unique id for the user based on the socket id and time
     const hash = xxh.h32(`${socket.id}${new Date().getTime()}`, 0xCAFEBABE).toString(16);
 
     // create a new character and store it by its unique id
     charList[hash] = new Character(hash);
+    // keep track of the users room too
+    charList[hash].room = svrRoom;
+
+    // awkwardly set room because have to have it defined for physics
+    userRoom = charList[hash].room;
+
+    // Adjust the characters color and position in the game, based on what order they joined
+    if (users % 4 === 0) {
+        // Fourth user
+        // Make them blue and top right corner
+      charList[hash].x = 650;
+      charList[hash].prevX = 650;
+      charList[hash].destX = 650;
+      charList[hash].color = 'blue';
+
+      // when a fourth user does join, incriment the room number
+      roomNum++;
+      // and reset users count
+      users = 0;
+    } else if (users % 3 === 0) {
+       // third user
+       // make them green and bottom left corner
+      charList[hash].y = 650;
+      charList[hash].prevY = 650;
+      charList[hash].destY = 650;
+      charList[hash].color = 'green';
+    } else if (users % 2 === 0) {
+       // Second user
+       // make them yellow and bottom right
+      charList[hash].x = 650;
+      charList[hash].prevX = 650;
+      charList[hash].destX = 650;
+      charList[hash].y = 650;
+      charList[hash].prevY = 650;
+      charList[hash].destY = 650;
+      charList[hash].color = 'yellow';
+    } // our default is taken care of in character intializtion. first user is red and top left
 
     // add the id to the user's socket object for quick reference
     socket.hash = hash;
 
+
     // emit a joined event to the user and send them their character
     socket.emit('joined', charList[hash]);
+    // send amount of users to client so we know if we can start
+    io.sockets.in(charList[hash].room).emit('userUpdate', users);
 
     // when this user sends the server a movement update
     socket.on('movementUpdate', (data) => {
@@ -130,7 +182,7 @@ const setupSockets = (ioServer) => {
       physics.send(new Message('charList', charList));
 
       // notify everyone of the user's updated movement
-      io.sockets.in('room1').emit('updatedMovement', charList[socket.hash]);
+      io.sockets.in(charList[hash].room).emit('updatedMovement', charList[socket.hash]);
     });
 
     // when this user sends an attack request
@@ -148,24 +200,30 @@ const setupSockets = (ioServer) => {
         // send the graphical update to everyone
         // This will NOT perform the collision or character death
         // This just updates graphics so people see the attack
-        io.sockets.in('room1').emit('attackUpdate', attack);
+        io.sockets.in(charList[hash].room).emit('attackUpdate', attack);
 
         // add the attack to our physics calculations
-        physics.send(new Message('attack', attack));
+        // Three seconds after the attack happens, emit it for our physics calculations
+        setTimeout(() => {
+          io.sockets.in(charList[hash].room).emit('detonate', attack);
+          physics.send(new Message('attack', attack));
+        }, 3000);
       }
     });
 
     // when the user disconnects
     socket.on('disconnect', () => {
       // let everyone know this user left
-      io.sockets.in('room1').emit('left', charList[socket.hash]);
+      io.sockets.in(charList[hash].room).emit('left', charList[socket.hash]);
+      // note the room theyre in
+      userRoom = charList[hash].room;
       // remove this user from our object
       delete charList[socket.hash];
       // update the character list in our physics calculations
       physics.send(new Message('charList', charList));
 
       // remove this user from the socket room
-      socket.leave('room1');
+      socket.leave(userRoom);
     });
   });
 };
