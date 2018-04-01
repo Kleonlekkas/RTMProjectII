@@ -251,28 +251,7 @@ const checkWallCollisions = (rect1, rect2, size1, size2) => {
   if (rect1.x < rect2.xPos + size2 &&
      rect1.x + size1 > rect2.xPos &&
      rect1.y < rect2.yPos + size2 &&
-     size1 + rect1.y > rect2.yPos) {
-		 ctx.fillStyle = "#FF0000";
-		ctx.beginPath(); // top left corner
-		ctx.moveTo(rect1.x, rect1.y);
-		ctx.lineTo(rect2.xPos, rect2.yPos);
-		ctx.stroke();
-		
-		ctx.beginPath(); //top right corner
-		ctx.moveTo(rect1.x + size1, rect1.y);
-		ctx.lineTo(rect2.xPos + size2, rect2.yPos);
-		ctx.stroke();
-		
-		ctx.beginPath();
-		ctx.moveTo(rect1.x, rect1.y + size1); //bottom left corner
-		ctx.lineTo(rect2.xPos, rect2.yPos + size1);
-		ctx.stroke();
-		
-		ctx.beginPath();
-		ctx.moveTo(rect1.x + size1, rect1.y + size1); //bottom right corner
-		ctx.lineTo(rect2.xPos + size2, rect2.yPos + size2);
-		ctx.stroke();
-		
+     size1 + rect1.y > rect2.yPos) {	
     return true; // is colliding
   }
   return false; // is not colliding
@@ -296,19 +275,7 @@ const detonateBomb = (attack) => {
 
 const drawBomb = (attack) => {
 	ctx.fillStyle = "#FF0000";
-	//draw squares to represent explosion
-	/*
-	for(var i = 0; i < attack.power; i++) {
-		
-		//draw in each direction
-		ctx.fillRect(attack.x + (i * 65), attack.y, 60, 60);
-		ctx.fillRect(attack.x - (i * 65), attack.y, 60, 60);
-		ctx.fillRect(attack.x, attack.y + (i * 65), 60, 60);
-		ctx.fillRect(attack.x, attack.y - (i * 65), 60, 60);
-	} */
-	//will probably have to get top portion working, so i can actually stop
 	//drawing explosions if i hit a wall
-	//const offSet = (attack.power + 2) * 65;
 	const offSet = (attack.power) * 65;
 	
 	//x direction
@@ -382,4 +349,17 @@ const gameStart = (userCount) => {
 	if (userCount > 1) {
 		playGame = true;
 	}
+};
+
+const handleUpgrade = (data) => {
+	//if they exist
+	if (squares[hash]) {
+		squares[hash].power += 1;
+	    squares[hash].speed += 1;
+		powerVal = squares[hash].power;
+		speedVal = squares[hash].speed;
+		power.innerHTML = "Power: " + powerVal;
+		speed.innerHTML = "Speed: " + speedVal;
+	}
+
 };

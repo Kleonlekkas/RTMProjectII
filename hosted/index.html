@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>lit</title>
+    <title>Boomer Square</title>
     <meta charset="utf-8"/>
     <style>
       html, body {
@@ -15,6 +15,10 @@
         margin: 10px;
         border: 1px solid black;
       }
+	  
+	  h2 {
+		text-align: center;
+	  }
       
       p {
         margin-left: 12px;
@@ -25,6 +29,30 @@
       .hidden {
         display: none;
       }
+	  
+	  .instructions {
+		color: #FFFFFF;
+		float: right;
+		background-color: #1E90FF;
+		position: absolute;
+		right: 10px;
+		top: 10px;
+		width: 300px;
+		padding: 10px;
+		height: 300px;
+	  }
+	  
+	  .feedback {
+		color: #FFFFFF;
+		float: right;
+		background-color: #1E90FF;
+		position: absolute;
+		right: 10px;
+		bottom: 10px;
+		width: 300px;
+		height: 100px;
+		padding: 10px;
+	  }
     </style>
     <script src="/socket.io/socket.io.js"></script>
 	<script src="/assets/compiled.js"> </script>
@@ -34,5 +62,20 @@
     <canvas id="canvas" height="715" width="715">Please use an HTML 5 browser</canvas>
     <img id="walk" class="hidden" src="/assets/walk.png" alt="walk spritesheet" />
     <img id="bomb" class="hidden" src="/assets/bomb.png" alt="bomb image" />
+	
+	<div class="instructions">
+		<h2>Boomer Square</h2>
+		<p>Eliminate all other players</p>
+		</br>
+		
+		<p>Use WASD To move around</p>
+		<p>Space to place a bomb</p>
+		
+	</div>
+	
+	<div class="feedback">
+		<h3 id="power">Power: 1</h3>
+		<h3 id="speed">Speed: 5</h3>
+	</div>
 </body>
 </html>

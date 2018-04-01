@@ -46,23 +46,19 @@ const redraw = (time) => {
   for(let n = 0; n < wallKeys.length; n++) {
 	ctx.fillRect(walls[n].xPos, walls[n].yPos, 65, 65);
   }
-  
-    ctx.fillStyle = "#0000FF";
-    for(let n = 0; n < wallKeys.length; n++) {
-	ctx.fillRect(walls[n].xPos, walls[n].yPos, 10, 10);
-  }
+
   
 	//check to see if theyre colliding
    for(let n = 0; n < wallKeys.length; n++) {
 	//character, wall, character size, wall size
 	if (checkWallCollisions(squares[hash], walls[n], 50, 65)) {
-		console.log("colliding!");
+		//console.log("colliding!");
 		const square = squares[hash];
 		playerCanMove = false;
 		//find their closest point
 		var cp = findClosestPoint(square);
 		//find out where theyre colliding
-		console.log(findSide(square, walls[n]));
+		//console.log(findSide(square, walls[n]));
 		
 		square.destX = sectionArray[cp].x;
 		square.destY = sectionArray[cp].y;		

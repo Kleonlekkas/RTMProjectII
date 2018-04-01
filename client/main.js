@@ -1,6 +1,5 @@
 let canvas;
 let ctx;
-let walkImage;
 let bombImage;
 //our websocket connection
 let socket; 
@@ -31,6 +30,12 @@ let playGame = false;
 //keep track of the amount of bombs the user has placed
 let bombLimit = 1;
 let bombCount = 0;
+
+//hook up our characters attributes to docs
+let power;
+let speed;
+let powerVal;
+let speedVal;
 
 //store the current section
 let sectionArray = [];
@@ -94,8 +99,9 @@ const keyUpHandler = (e) => {
 };
 
 const init = () => {
-  walkImage = document.querySelector('#walk');
   bombImage = document.querySelector('#bomb');
+  power = document.querySelector('#power');
+  speed = document.querySelector('#speed');
   
   canvas = document.querySelector('#canvas');
   ctx = canvas.getContext('2d');
@@ -129,6 +135,7 @@ const init = () => {
   socket.on('detonate', detonateBomb);
   socket.on('left', removeUser); //when a user leaves
   socket.on('userUpdate', gameStart);
+  socket.on('upgrade', handleUpgrade);
 
   document.body.addEventListener('keydown', keyDownHandler);
   document.body.addEventListener('keyup', keyUpHandler);

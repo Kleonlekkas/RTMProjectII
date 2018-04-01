@@ -45,7 +45,7 @@ let userRoom;
 // Ours will not exit because it is running a timer to constantly check
 // calculations for us. In this case, it will only close/exit on failure.
 /**
-  Please note: These separate processes can only communicate via a messaging
+  Note: These separate processes can only communicate via a messaging
   system. They do not share memory or scope so transferring data/variables
   has to happen through messages. Calling functions in the other process
   must also happen through messages.
@@ -172,6 +172,18 @@ const setupSockets = (ioServer) => {
     if (users >= 4) {
       users = 0;
     }
+
+    // Temporary gameplay progression until terrain gets generated the user breaks
+    // to acquire random power-ups   --every ten seconds
+    setInterval(() => {
+      // for now, we'll just incriment them client side
+      if (charList[socket.hash]) {
+        charList[socket.hash].power += 1;
+        charList[socket.hash].speed += 2;
+        // not too efficient, but fine for now
+        socket.emit('upgrade', charList[socket.hash]);
+      }
+    }, 10000);
 
     // when this user sends the server a movement update
     socket.on('movementUpdate', (data) => {

@@ -37,11 +37,6 @@ const checkAttackCollision = (character, attackObj) => {
   return checkCollisions(character, attack, attack.width, attack.height);
 };
 
-// when the server recieves an attack, start a timer for that attack object.
-// const startAttackTimer = (attackObj) => {
-
-// };
-
 // handle each attack and calculate collisions
 const checkAttacks = () => {
   // if we have attack

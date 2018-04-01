@@ -19,6 +19,7 @@ class Character {
     this.moveUp = false;
     this.color = 'orange';
     this.power = 1;
+    this.speed = 5;
     this.limit = 1;
   }
 }

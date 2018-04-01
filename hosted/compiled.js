@@ -48,22 +48,17 @@ var redraw = function redraw(time) {
     ctx.fillRect(walls[n].xPos, walls[n].yPos, 65, 65);
   }
 
-  ctx.fillStyle = "#0000FF";
-  for (var _n = 0; _n < wallKeys.length; _n++) {
-    ctx.fillRect(walls[_n].xPos, walls[_n].yPos, 10, 10);
-  }
-
   //check to see if theyre colliding
-  for (var _n2 = 0; _n2 < wallKeys.length; _n2++) {
+  for (var _n = 0; _n < wallKeys.length; _n++) {
     //character, wall, character size, wall size
-    if (checkWallCollisions(squares[hash], walls[_n2], 50, 65)) {
-      console.log("colliding!");
+    if (checkWallCollisions(squares[hash], walls[_n], 50, 65)) {
+      //console.log("colliding!");
       var square = squares[hash];
       playerCanMove = false;
       //find their closest point
       var cp = findClosestPoint(square);
       //find out where theyre colliding
-      console.log(findSide(square, walls[_n2]));
+      //console.log(findSide(square, walls[n]));
 
       square.destX = sectionArray[cp].x;
       square.destY = sectionArray[cp].y;
@@ -147,7 +142,6 @@ var redraw = function redraw(time) {
 
 var canvas = void 0;
 var ctx = void 0;
-var walkImage = void 0;
 var bombImage = void 0;
 //our websocket connection
 var socket = void 0;
@@ -178,6 +172,12 @@ var playGame = false;
 //keep track of the amount of bombs the user has placed
 var bombLimit = 1;
 var bombCount = 0;
+
+//hook up our characters attributes to docs
+var power = void 0;
+var speed = void 0;
+var powerVal = void 0;
+var speedVal = void 0;
 
 //store the current section
 var sectionArray = [];
@@ -238,8 +238,9 @@ var keyUpHandler = function keyUpHandler(e) {
 };
 
 var init = function init() {
-	walkImage = document.querySelector('#walk');
 	bombImage = document.querySelector('#bomb');
+	power = document.querySelector('#power');
+	speed = document.querySelector('#speed');
 
 	canvas = document.querySelector('#canvas');
 	ctx = canvas.getContext('2d');
@@ -262,6 +263,7 @@ var init = function init() {
 	socket.on('detonate', detonateBomb);
 	socket.on('left', removeUser); //when a user leaves
 	socket.on('userUpdate', gameStart);
+	socket.on('upgrade', handleUpgrade);
 
 	document.body.addEventListener('keydown', keyDownHandler);
 	document.body.addEventListener('keyup', keyUpHandler);
@@ -517,27 +519,6 @@ var checkWallCollisions = function checkWallCollisions(rect1, rect2, size1, size
 	//left side of first rect is less than the second rects right side
 	//right side of first rect is greater than second rects left side		
 	if (rect1.x < rect2.xPos + size2 && rect1.x + size1 > rect2.xPos && rect1.y < rect2.yPos + size2 && size1 + rect1.y > rect2.yPos) {
-		ctx.fillStyle = "#FF0000";
-		ctx.beginPath(); // top left corner
-		ctx.moveTo(rect1.x, rect1.y);
-		ctx.lineTo(rect2.xPos, rect2.yPos);
-		ctx.stroke();
-
-		ctx.beginPath(); //top right corner
-		ctx.moveTo(rect1.x + size1, rect1.y);
-		ctx.lineTo(rect2.xPos + size2, rect2.yPos);
-		ctx.stroke();
-
-		ctx.beginPath();
-		ctx.moveTo(rect1.x, rect1.y + size1); //bottom left corner
-		ctx.lineTo(rect2.xPos, rect2.yPos + size1);
-		ctx.stroke();
-
-		ctx.beginPath();
-		ctx.moveTo(rect1.x + size1, rect1.y + size1); //bottom right corner
-		ctx.lineTo(rect2.xPos + size2, rect2.yPos + size2);
-		ctx.stroke();
-
 		return true; // is colliding
 	}
 	return false; // is not colliding
@@ -560,19 +541,7 @@ var detonateBomb = function detonateBomb(attack) {
 
 var drawBomb = function drawBomb(attack) {
 	ctx.fillStyle = "#FF0000";
-	//draw squares to represent explosion
-	/*
- for(var i = 0; i < attack.power; i++) {
- 	
- 	//draw in each direction
- 	ctx.fillRect(attack.x + (i * 65), attack.y, 60, 60);
- 	ctx.fillRect(attack.x - (i * 65), attack.y, 60, 60);
- 	ctx.fillRect(attack.x, attack.y + (i * 65), 60, 60);
- 	ctx.fillRect(attack.x, attack.y - (i * 65), 60, 60);
- } */
-	//will probably have to get top portion working, so i can actually stop
 	//drawing explosions if i hit a wall
-	//const offSet = (attack.power + 2) * 65;
 	var offSet = attack.power * 65;
 
 	//x direction
@@ -643,5 +612,17 @@ var findSide = function findSide(square, wall) {
 var gameStart = function gameStart(userCount) {
 	if (userCount > 1) {
 		playGame = true;
+	}
+};
+
+var handleUpgrade = function handleUpgrade(data) {
+	//if they exist
+	if (squares[hash]) {
+		squares[hash].power += 1;
+		squares[hash].speed += 1;
+		powerVal = squares[hash].power;
+		speedVal = squares[hash].speed;
+		power.innerHTML = "Power: " + powerVal;
+		speed.innerHTML = "Speed: " + speedVal;
 	}
 };
