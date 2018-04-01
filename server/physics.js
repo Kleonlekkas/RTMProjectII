@@ -7,13 +7,23 @@ const attacks = []; // array of attack to handle
 
 // box collision check between two rectangles
 // of a set width/height
+// width is set at 60,
+// height is the magnitude of the attack in this case
 const checkCollisions = (rect1, rect2, width, height) => {
+  // for x
+  if (rect1.x < rect2.xOff + height &&
+     rect1.x + width > rect2.xOff &&
+     rect1.y < rect2.y + width &&
+     width + rect1.y > rect2.y) {
+    return true;
+  }
+  // for y
   if (rect1.x < rect2.x + width &&
      rect1.x + width > rect2.x &&
-     rect1.y < rect2.y + height &&
-     height + rect1.y > rect2.y) {
-    return true; // is colliding
-  }
+     rect1.y < rect2.yOff + height &&
+     rect1.y + width > rect2.yOff) {
+    return true;
+  } // is colliding */
   return false; // is not colliding
 };
 
@@ -22,11 +32,6 @@ const checkCollisions = (rect1, rect2, width, height) => {
 // themselves
 const checkAttackCollision = (character, attackObj) => {
   const attack = attackObj;
-
-  // if attacking themselves, we won't check collision
-  if (character.hash === attack.hash) {
-    return false;
-  }
 
   // otherwise check collision of user rect and attack rect
   return checkCollisions(character, attack, attack.width, attack.height);
@@ -68,7 +73,7 @@ const checkAttacks = () => {
           delete charList[char1.hash];
         } else {
           // if not a hit
-          console.log('miss');
+          // console.log('miss');
         }
       }
 

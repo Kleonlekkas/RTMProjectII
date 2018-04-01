@@ -141,7 +141,6 @@ const setupSockets = (ioServer) => {
       // when a fourth user does join, incriment the room number
       roomNum++;
       // and reset users count
-      users = 0;
     } else if (users % 3 === 0) {
        // third user
        // make them green and bottom left corner
@@ -169,6 +168,10 @@ const setupSockets = (ioServer) => {
     socket.emit('joined', charList[hash]);
     // send amount of users to client so we know if we can start
     io.sockets.in(charList[hash].room).emit('userUpdate', users);
+    // reset user count after updating the fourth user
+    if (users >= 4) {
+      users = 0;
+    }
 
     // when this user sends the server a movement update
     socket.on('movementUpdate', (data) => {
@@ -192,8 +195,8 @@ const setupSockets = (ioServer) => {
       // should we handle the attack
       const handleAttack = true;
 
-      attack.width = 60;
       attack.height = 60;
+      attack.width = 60;
 
       // if handling the attack
       if (handleAttack) {
@@ -206,6 +209,17 @@ const setupSockets = (ioServer) => {
         // Three seconds after the attack happens, emit it for our physics calculations
         setTimeout(() => {
           io.sockets.in(charList[hash].room).emit('detonate', attack);
+          // compute the collision of the attack
+          const offSet = (attack.power) * 65;
+
+          // for our physics calculations
+          attack.xOff = attack.x - offSet;
+          attack.yOff = attack.y - offSet;
+          // width is the width of the attack, which is capped at 60
+          attack.width = 60;
+          // height is the magnitude of the attack which is the same in both directions
+          attack.height = ((attack.power * 2) + 1) * 65;
+
           physics.send(new Message('attack', attack));
         }, 3000);
       }

@@ -102,6 +102,12 @@ const redraw = (time) => {
 		//Draw the actual explosion
 		drawBomb(attack);
 		if (attack.frames > 30) {
+			//check to see if its our bomb
+			if (attack.hash == hash) {
+				//decrease our bombCount
+				bombCount--;
+			}
+			
 			attacks.splice(i);
 			//decrease i since splice changes array length
 			i--;

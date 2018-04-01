@@ -59,6 +59,8 @@ const receiveAttack = (data) => {
 const sendAttack = () => {
   const square = squares[hash];
   
+  //if the user has the available amount of bombs
+  if (bombCount < bombLimit) {
 	//create a new attack at the closest appropriate point
 	var cp = findClosestPoint(square);
 	//check if that point is fine
@@ -78,6 +80,9 @@ const sendAttack = () => {
 		//send request to server
 		socket.emit('attack', attack);	
 	}	
+	bombCount ++;
+  }
+
   
 
 };
@@ -192,8 +197,8 @@ const populatePointArray = () => {
 	var yPos;
 	for (var i = 0; i < 11; i++) { //y
 		for (var n = 0; n < 11; n++) { //x
-			yPos = (i * 65);
-			xPos = (n * 65);
+			yPos = (i * 65 + 2);
+			xPos = (n * 65 + 2);
 			//if were in a row with walls, we dont need to draw wall points
 			//**NOTE THIS ONLY WORKS FOR THE CURRENT MAP**
 			if (i % 2 == 1) {
@@ -303,13 +308,13 @@ const drawBomb = (attack) => {
 	} */
 	//will probably have to get top portion working, so i can actually stop
 	//drawing explosions if i hit a wall
-	console.log("bomb has been boomed");
-	const offSet = (attack.power + 2) * 65;
+	//const offSet = (attack.power + 2) * 65;
+	const offSet = (attack.power) * 65;
 	
 	//x direction
-	ctx.fillRect(attack.x - offSet/3, attack.y, offSet, 60);
+	ctx.fillRect(attack.x - offSet, attack.y, ((attack.power * 2) + 1) * 65, 60);
 	//y direction
-	ctx.fillRect(attack.x, attack.y - offSet/3, 60, offSet);
+	ctx.fillRect(attack.x, attack.y - offSet, 60, ((attack.power * 2) + 1) * 65);
 };
 
 //Helper distance function

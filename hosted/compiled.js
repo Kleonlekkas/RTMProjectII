@@ -97,6 +97,12 @@ var redraw = function redraw(time) {
       //Draw the actual explosion
       drawBomb(attack);
       if (attack.frames > 30) {
+        //check to see if its our bomb
+        if (attack.hash == hash) {
+          //decrease our bombCount
+          bombCount--;
+        }
+
         attacks.splice(i);
         //decrease i since splice changes array length
         i--;
@@ -168,6 +174,10 @@ var map = [];
 
 //boolean to check if theres enough users.
 var playGame = false;
+
+//keep track of the amount of bombs the user has placed
+var bombLimit = 1;
+var bombCount = 0;
 
 //store the current section
 var sectionArray = [];
@@ -321,22 +331,26 @@ var receiveAttack = function receiveAttack(data) {
 var sendAttack = function sendAttack() {
 	var square = squares[hash];
 
-	//create a new attack at the closest appropriate point
-	var cp = findClosestPoint(square);
-	//check if that point is fine
-	//hold a unique hash, coordinates, power, the index of the point in section array, and a hasDetonated bool
-	if (pointAvailable(cp)) {
-		var attack = {
-			hash: hash,
-			x: sectionArray[cp].x,
-			y: sectionArray[cp].y,
-			power: square.power,
-			frames: 0,
-			index: cp,
-			det: false
+	//if the user has the available amount of bombs
+	if (bombCount < bombLimit) {
+		//create a new attack at the closest appropriate point
+		var cp = findClosestPoint(square);
+		//check if that point is fine
+		//hold a unique hash, coordinates, power, the index of the point in section array, and a hasDetonated bool
+		if (pointAvailable(cp)) {
+			var attack = {
+				hash: hash,
+				x: sectionArray[cp].x,
+				y: sectionArray[cp].y,
+				power: square.power,
+				frames: 0,
+				index: cp,
+				det: false
 
-			//send request to server
-		};socket.emit('attack', attack);
+				//send request to server
+			};socket.emit('attack', attack);
+		}
+		bombCount++;
 	}
 };
 
@@ -452,8 +466,8 @@ var populatePointArray = function populatePointArray() {
 		//y
 		for (var n = 0; n < 11; n++) {
 			//x
-			yPos = i * 65;
-			xPos = n * 65;
+			yPos = i * 65 + 2;
+			xPos = n * 65 + 2;
 			//if were in a row with walls, we dont need to draw wall points
 			//**NOTE THIS ONLY WORKS FOR THE CURRENT MAP**
 			if (i % 2 == 1) {
@@ -558,13 +572,13 @@ var drawBomb = function drawBomb(attack) {
  } */
 	//will probably have to get top portion working, so i can actually stop
 	//drawing explosions if i hit a wall
-	console.log("bomb has been boomed");
-	var offSet = (attack.power + 2) * 65;
+	//const offSet = (attack.power + 2) * 65;
+	var offSet = attack.power * 65;
 
 	//x direction
-	ctx.fillRect(attack.x - offSet / 3, attack.y, offSet, 60);
+	ctx.fillRect(attack.x - offSet, attack.y, (attack.power * 2 + 1) * 65, 60);
 	//y direction
-	ctx.fillRect(attack.x, attack.y - offSet / 3, 60, offSet);
+	ctx.fillRect(attack.x, attack.y - offSet, 60, (attack.power * 2 + 1) * 65);
 };
 
 //Helper distance function

@@ -28,6 +28,10 @@ let map = [];
 //boolean to check if theres enough users.
 let playGame = false;
 
+//keep track of the amount of bombs the user has placed
+let bombLimit = 1;
+let bombCount = 0;
+
 //store the current section
 let sectionArray = [];
 
